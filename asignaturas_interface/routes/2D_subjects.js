@@ -1,0 +1,19 @@
+let soap = require("soap");
+let url = "http://35.196.243.64:8000/wsdl";
+let express = require("express");
+let router = express.Router();
+
+const request_2D_subjects = async (req, res) => {
+  console.log("Requesting 2D subjects...");
+  let client = await soap.createClientAsync(url);
+  console.log("Client created...");
+  let result = await client.AllSubjects({});
+  console.log(result);
+  return result;
+};
+router.get("/", async (req, res) => {
+  let result = await request_2D_subjects(req, res);
+  res.send(result);
+});
+
+module.exports = router;

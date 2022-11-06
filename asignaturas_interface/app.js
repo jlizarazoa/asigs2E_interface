@@ -6,6 +6,7 @@ const logger = require("morgan");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const AsignaturasService = require("./services/asignaturasService");
+const request_2D_subjects = require("./routes/2D_subjects");
 const app = express();
 
 // view engine setup
@@ -22,6 +23,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
 app.use("/soap/asignaturas", AsignaturasService);
+app.use("/soap/2D_subjects", request_2D_subjects);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
