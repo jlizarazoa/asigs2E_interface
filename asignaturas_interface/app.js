@@ -124,7 +124,9 @@ app.use(
             <soap:body use="literal" />
           </input>
           <output>
-            <soap:body use="literal" />
+            <soap:body>
+              <soap:encodingStyle value="http://schemas.xmlsoap.org/soap/encoding/" />
+            </soap:body>
           </output>
         </operation>
       </binding>
