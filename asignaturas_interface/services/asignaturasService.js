@@ -1,59 +1,108 @@
 let soap = require("express-soap");
 let fs = require("fs");
 let path = require("path");
+const { json } = require('express');
+var express = require('express');
+var router = express.Router();
 
 const wsdlService = fs.readFileSync(
   path.join(path.join(__dirname, "wsdl"), "asignaturasService.wsdl"),
   "utf8"
 );
-const AsignaturasTotales = (args) => {
+
+const fakeInfo = () => {
   return {
-    codigo_asignatura_ingresado: args.codigo_asignatura,
-    asignatura: [
-      {
-        codigo_asignatura: 10,
-        creditos: 6,
-        nombre_asignatura: "Matematicas",
-        descripcion: "Matematicas basicas",
-      },
-      {
-        codigo_asignatura: 20,
-        creditos: 6,
-        nombre_asignatura: "Fisica",
-        descripcion: "Fisica basica",
-      },
-      {
-        codigo_asignatura: 30,
-        creditos: 6,
-        nombre_asignatura: "Quimica",
-        descripcion: "Quimica basica",
-      },
-      {
-        codigo_asignatura: 40,
-        creditos: 6,
-        nombre_asignatura: "Programacion",
-        descripcion: "Programacion basica",
-      },
+    asignatura: 
       {
         codigo_asignatura: 50,
         creditos: 6,
         nombre_asignatura: "Ingles",
         descripcion: "Ingles basico",
-      },
-    ],
-  };
-};
+        tipo: {
+          id_tipologia: 1,
+          nombre_tipologia: "Libre elección",
+        },
+        programa: {
+          id_programa: 2,
+          nombre_programa: "Lingüistica",
+          facultad: {
+            id_facultad: 4,
+            nombre_facultad: "Lingüistica",
+            sede: {
+              id_sede: 1,
+              nombre_sede: "Bogotá",
+            }
+          },
+        }
+      }
+  }
+}
+
+const queryAsignature = (args) => `{
+  asignatura(codigo_asignatura: ${args}){
+    codigo_asignatura
+    nombre_asignatura
+    creditos
+    descripcion
+    tipo {
+      id_tipologia
+      nombre_tipologia
+    }
+    programa {
+      id_programa
+      nombre_programa
+      facultad {
+        id_facultad
+        nombre_facultad
+        sede {
+          id_sede
+          nombre_sede
+        }
+      }
+    }
+  }
+}`
+const url = `http://host.docker.internal:4010/fetch_buscador_cursos`;
+
+const fetch = (...args) =>
+  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
+
+async function auxGetAsignatures(args) {
+  const query = queryAsignature(args)
+  
+  try {
+    const response = await fetch(url, 
+      {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          query
+        })
+      })
+    const data = await response.json()
+    return data.data
+  } catch (error) {
+    return null
+  }
+}
 
 const AsignaturasService = soap.soap({
   services: {
     AsignaturasService: {
       AsignaturasSoap: {
-        GetAsignaturas({ codigo_asignatura }, res) {
-          res(
-            AsignaturasTotales({
-              codigo_asignatura: codigo_asignatura,
+        async GetAsignaturas({ codigo_asignatura }, res) {
+
+          res({asignatura: await auxGetAsignatures(codigo_asignatura).then(data => {
+            if (data == null) {
+              return [fakeInfo().asignatura]
+            }
+            return [data.asignatura]
             })
-          );
+          });
         },
       },
     },
