@@ -22,16 +22,20 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
+const Add = (args) => {
+  return {
+    test: "This is a test request",
+    addResult: [args.intA + args.intB, args.intA + args.intB],
+  };
+};
 app.use(
   "/soap/calculation",
   soap.soap({
     services: {
       CalculatorService: {
-        Calculator: {
+        CalculatorSoap: {
           Add({ a, b }, res) {
-            res({
-              result: a + b,
-            });
+            res(Add({ intA: a, intB: b }));
           },
           Subtract({ a, b }, res) {
             res({
@@ -50,8 +54,8 @@ app.use(
           <xsd:element name="Add">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element minOccurs="0" name="a" nillable="true" type="xsd:int" />
-                <xsd:element minOccurs="0" name="b" nillable="true" type="xsd:int" /> 
+                <xsd:element minOccurs="0" name="a" type="xsd:int" />
+                <xsd:element minOccurs="0" name="b" type="xsd:int" /> 
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -104,16 +108,18 @@ app.use(
       <binding name="CalculatorSoap" type="tns:CalculatorSoap">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
         <operation name="Add">
-          <soap:operation soapAction="Add" style="document" />
+          <soap:operation soapAction="http://tempuri.org/Add" style="document" />
           <input>
             <soap:body use="literal" />
           </input>
           <output>
-            <soap:body use="literal" />
+            <soap:body>
+              <soap:encodingStyle value="http://schemas.xmlsoap.org/soap/encoding/" />
+            </soap:body>
           </output>
         </operation>
         <operation name="Subtract">
-          <soap:operation soapAction="Subtract" style="document" />
+          <soap:operation soapAction="http://tempuri.org/Subtract" style="document" />
           <input>
             <soap:body use="literal" />
           </input>
@@ -128,8 +134,6 @@ app.use(
         </port>
       </service>
     </definitions>
-
-
     `, // or xml (both options are valid)
   })
 );
