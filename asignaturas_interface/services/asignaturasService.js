@@ -8,6 +8,7 @@ const wsdlService = fs.readFileSync(
 );
 const AsignaturasTotales = (args) => {
   return {
+    codigo_asignatura_ingresado: args.codigo_asignatura,
     asignatura: [
       {
         codigo_asignatura: 10,
@@ -47,8 +48,12 @@ const AsignaturasService = soap.soap({
   services: {
     AsignaturasService: {
       AsignaturasSoap: {
-        GetAsignaturas({ a, b }, res) {
-          res(AsignaturasTotales({ intA: a, intB: b }));
+        GetAsignaturas({ codigo_asignatura }, res) {
+          res(
+            AsignaturasTotales({
+              codigo_asignatura: codigo_asignatura,
+            })
+          );
         },
       },
     },
