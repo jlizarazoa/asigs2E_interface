@@ -8,7 +8,7 @@ const wsdlService = fs.readFileSync(
 );
 const AsignaturasTotales = (args) => {
   return {
-    asignaturas: [
+    asignatura: [
       {
         codigo_asignatura: 10,
         creditos: 6,
