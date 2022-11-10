@@ -9,11 +9,11 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
-    "express-soap": "^1.1.2",
     "http-errors": "~1.6.3",
+    "httpntlm": "^1.7.7",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "node-fetch": "^3.2.10",
-    "httpntlm": "^1.7.7"
+    "soap": "^0.30.0"
   }
 }
